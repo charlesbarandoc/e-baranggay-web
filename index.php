@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Barangay Bacsay Mapula-pula | Official Portal</title>
-    
+     <link rel="stylesheet" href="style.css">
+
     <script src="https://cdn.tailwindcss.com"></script>
 
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -225,6 +226,32 @@
         </div>
     </section>
 
+<!-- Chatbot Widget -->
+<div id="chatbot" class="fixed bottom-6 right-6 w-80 max-w-full bg-white shadow-xl rounded-xl overflow-hidden flex flex-col">
+    
+    <!-- Header -->
+    <div id="chatbot-header" class="bg-red-600 text-white px-4 py-3 cursor-pointer flex justify-between items-center">
+        <span>BM Assistant</span>
+        <span id="chatbot-toggle">✕</span>
+    </div>
+
+    <!-- Body -->
+    <div id="chatbot-body" class="p-4 flex-1 overflow-y-auto hidden flex-col space-y-2 bg-slate-50">
+    </div>
+
+    <!-- Input Area -->
+    <div id="chatbot-input-area" class="p-2 bg-slate-100 hidden flex flex-col space-y-2">
+        <input type="text" id="chatbot-username" placeholder="Enter your name..." class="px-3 py-2 rounded-lg border border-slate-300 focus:outline-none" />
+        <div class="flex">
+            <input type="text" id="chatbot-input" placeholder="Type your question..." class="flex-1 px-3 py-2 rounded-l-lg border border-slate-300 focus:outline-none" />
+            <button id="chatbot-send" class="bg-red-600 text-white px-4 py-2 rounded-r-lg hover:bg-red-700">Send</button>
+        </div>
+    </div>
+</div>
+
+
+
+
     <!-- FOOTER -->
     <footer id="contact" class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800">
         <div class="container mx-auto px-4">
@@ -254,7 +281,7 @@
                 <div>
                     <h4 class="text-white font-bold mb-4">Office Hours</h4>
                     <ul class="space-y-2 text-sm">
-                        <li class="flex justify-between"><span>Mon - Fri</span><span class="text-white">8:00 AM - 5:00 PM</span></li>
+                        <li class="flex justify-between"><span>Mon - Sat</span><span class="text-white">8:00 AM - 5:00 PM</span></li>
                         <li class="flex justify-between"><span>Sunday</span><span class="text-red-400">Closed</span></li>
                     </ul>
                 </div>
@@ -345,5 +372,87 @@
             });
         }
     </script>
+
+  <script>
+const chatbotHeader = document.getElementById('chatbot-header');
+const chatbotBody = document.getElementById('chatbot-body');
+const chatbotInputArea = document.getElementById('chatbot-input-area');
+const chatbotToggle = document.getElementById('chatbot-toggle');
+const chatbotInput = document.getElementById('chatbot-input');
+const chatbotSend = document.getElementById('chatbot-send');
+const chatbotUsername = document.getElementById('chatbot-username');
+
+let username = 'Guest';
+
+// Toggle chatbot visibility
+chatbotHeader.addEventListener('click', () => {
+    const isHidden = chatbotBody.classList.contains('hidden');
+    chatbotBody.classList.toggle('hidden', !isHidden);
+    chatbotInputArea.classList.toggle('hidden', !isHidden);
+});
+
+// Capture username
+chatbotUsername.addEventListener('keypress', (e) => {
+    if(e.key === 'Enter' && chatbotUsername.value.trim() !== '') {
+        username = chatbotUsername.value.trim();
+        chatbotUsername.disabled = true;
+        appendMessage(`Hello ${username}! How can I assist you today?`, 'bot-msg');
+    }
+});
+
+// Send message on button or Enter
+chatbotSend.addEventListener('click', sendMessage);
+chatbotInput.addEventListener('keypress', (e) => {
+    if(e.key === 'Enter') sendMessage();
+});
+
+// Send user message and fetch response
+function sendMessage() {
+    const msg = chatbotInput.value.trim();
+    if(!msg) return;
+
+    appendMessage(msg, 'user-msg');
+    chatbotInput.value = '';
+
+    fetch('chatbot-response.php', {
+        method: 'POST',
+        headers: {'Content-Type':'application/x-www-form-urlencoded'},
+        body: `message=${encodeURIComponent(msg)}&username=${encodeURIComponent(username)}`
+    })
+    .then(res => res.text())
+    .then(data => appendMessage(data, 'bot-msg', true));
+}
+
+// Append message to chat
+function appendMessage(message, type, parseHTML=false) {
+    const msgDiv = document.createElement('div');
+    msgDiv.classList.add('chatbot-msg', type);
+
+    const now = new Date();
+    const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+
+    if(parseHTML){
+        msgDiv.innerHTML = message + `<div class="timestamp">${time}</div>`;
+    } else {
+        msgDiv.textContent = message;
+        const ts = document.createElement('div');
+        ts.className = 'timestamp';
+        ts.textContent = time;
+        msgDiv.appendChild(ts);
+    }
+
+    // Highlight urgent news
+    if(type === 'bot-msg' && message.includes('(URGENT)')){
+        msgDiv.style.backgroundColor = '#fee2e2'; // light red
+        msgDiv.style.border = '1px solid #f87171';
+    }
+
+    chatbotBody.appendChild(msgDiv);
+    chatbotBody.scrollTop = chatbotBody.scrollHeight;
+}
+</script>
+
+
+
 </body>
 </html>

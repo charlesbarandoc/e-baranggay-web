@@ -1,0 +1,8 @@
+#chatbot { font-family: 'Inter', sans-serif; }
+#chatbot-body::-webkit-scrollbar { width: 6px; }
+#chatbot-body::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.2); border-radius: 3px; }
+
+.chatbot-msg { padding: 8px 12px; border-radius: 12px; max-width: 70%; word-wrap: break-word; position: relative; }
+.user-msg { background-color: #f87171; color: white; align-self: flex-end; }
+.bot-msg { background-color: #e2e8f0; color: #1e293b; align-self: flex-start; }
+.timestamp { font-size: 10px; color: #64748b; margin-top: 2px; text-align: right; }
