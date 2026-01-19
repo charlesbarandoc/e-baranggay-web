@@ -1,8 +1,8 @@
 <?php
-// admin-login.php - Simple admin authentication
+
 include 'db.php';
 
-// Handle login
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = sanitizeInput($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($username) || empty($password)) {
         $error = "Please enter both username and password";
     } else {
-        // Fetch admin user
+
         if ($pdo) {
             $stmt = $pdo->prepare("SELECT id, username, password FROM admin_users WHERE username = ? AND active = 1");
             $stmt->execute([$username]);
@@ -21,12 +21,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if ($admin && password_verify($password, $admin['password'])) {
-            // Set session
+
             $_SESSION['is_admin'] = true;
             $_SESSION['admin_id'] = $admin['id'];
             $_SESSION['admin_username'] = $admin['username'];
             
-            // Redirect to admin panel
+   
             header('Location: admin-panel.php');
             exit;
         } else {
@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Handle logout
+
 if (isset($_GET['logout'])) {
     session_destroy();
     header('Location: admin-login.php');

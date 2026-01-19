@@ -1,14 +1,13 @@
-// ================== SAFE HELPERS ==================
 function safeLucideInit() {
   if (window.lucide && typeof window.lucide.createIcons === "function") {
     window.lucide.createIcons();
   }
 }
 
-// Run once (won't crash if Lucide is missing)
+
 safeLucideInit();
 
-// ================== NAVBAR SCROLL EFFECT ==================
+
 const nav = document.getElementById('navbar');
 const navText = document.getElementById('nav-text');
 const navLinks = document.getElementById('nav-links');
@@ -44,7 +43,7 @@ window.addEventListener('scroll', () => {
   }
 });
 
-// ================== MOBILE MENU TOGGLE (SAFE) ==================
+
 const mobileMenuBtn = document.getElementById('mobile-menu-btn');
 if (mobileMenuBtn) {
   mobileMenuBtn.addEventListener('click', () => {
@@ -52,7 +51,7 @@ if (mobileMenuBtn) {
   });
 }
 
-// ================== NEWS FILTER ==================
+
 function filterNews(category) {
   const items = document.querySelectorAll('.news-item');
   const buttons = document.querySelectorAll('.filter-btn');
@@ -77,10 +76,10 @@ function filterNews(category) {
   });
 }
 
-// (Optional) expose to HTML onclick usage
+
 window.filterNews = filterNews;
 
-// ================== CHATBOT ==================
+
 document.addEventListener('DOMContentLoaded', function () {
   const chatbotHeader = document.getElementById('chatbot-header');
   const chatbotBody = document.getElementById('chatbot-body');
@@ -90,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const chatbotUsername = document.getElementById('chatbot-username');
   const quickReplies = document.getElementById('chatbot-quick-replies');
 
-  // Modals (optional)
+
   const docModal = document.getElementById('documentModal');
   const emergencyModal = document.getElementById('emergencyModal');
   const docForm = document.getElementById('documentForm');
@@ -107,17 +106,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
   let username = 'Guest';
 
-  // Toggle chatbot on header click
+
   chatbotHeader.addEventListener('click', () => {
     const isHidden = chatbotBody.classList.contains('hidden');
     chatbotBody.classList.toggle('hidden', !isHidden);
     chatbotInputArea.classList.toggle('hidden', !isHidden);
 
-    // Re-init icons only if Lucide exists
+
     safeLucideInit();
   });
 
-  // Username entry
+
   if (chatbotUsername) {
     chatbotUsername.addEventListener('keypress', (e) => {
       if (e.key === 'Enter' && chatbotUsername.value.trim() !== '') {
@@ -125,10 +124,10 @@ document.addEventListener('DOMContentLoaded', function () {
         chatbotUsername.disabled = true;
         appendMessage(`Hello ${username}! How can I assist you today?`, 'bot-msg');
 
-        // Show quick replies after name is set
+      
         if (quickReplies) {
   quickReplies.classList.remove('hidden');
-  quickReplies.style.display = 'flex';   // force show
+  quickReplies.style.display = 'flex';   
   quickReplies.style.flexWrap = 'wrap';
   quickReplies.style.gap = '8px';
 }
@@ -137,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // Quick replies handler
+  
   quickReplies?.addEventListener('click', (e) => {
     const btn = e.target.closest('button');
     if (!btn) return;
@@ -193,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const now = new Date();
     const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
 
-    // Safe rendering: use textContent only (prevents XSS)
+
     msgDiv.textContent = message;
 
     const ts = document.createElement('div');
@@ -205,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function () {
     chatbotBody.scrollTop = chatbotBody.scrollHeight;
   }
 
-  // ================== CHATBOT MODALS ==================
+ 
   const docInfo = {
     barangay_clearance: {
       title: 'Barangay Clearance',
@@ -238,7 +237,7 @@ document.addEventListener('DOMContentLoaded', function () {
     modalTitle.textContent = info.title;
     modalDescription.textContent = info.desc;
 
-    // Reset form message
+  
     if (formMessage) {
       formMessage.classList.add('hidden');
       formMessage.textContent = '';
@@ -261,12 +260,12 @@ document.addEventListener('DOMContentLoaded', function () {
     emergencyModal?.classList.remove('active');
   }
 
-  // Expose modal functions for inline onclick in chatbot.php
+  
   window.closeModal = closeModal;
   window.openEmergencyModal = openEmergencyModal;
   window.closeEmergencyModal = closeEmergencyModal;
 
-  // Document request submit (AJAX)
+ 
   if (docForm) {
     docForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -286,11 +285,11 @@ document.addEventListener('DOMContentLoaded', function () {
           const ref = data.reference_number ? `\nReference: ${data.reference_number}` : '';
           showFormMessage(`✅ Request sent successfully!${ref}`, true);
 
-          // Also show in chat for better UX
+         
           appendMessage(`Your document request was submitted.${ref}`, 'bot-msg');
 
           docForm.reset();
-          // Restore the document type (reset clears input values)
+     
           if (documentType) documentType.value = lastDocType;
         } else {
           showFormMessage(`❌ ${data?.message || 'Failed to submit request.'}`, false);
@@ -312,3 +311,177 @@ document.addEventListener('DOMContentLoaded', function () {
     formMessage.className = `mt-4 p-3 rounded-lg text-sm ${success ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`;
   }
 });
+
+window.openDocumentModal = function (type) {
+  const docModal = document.getElementById('documentModal');
+  const documentType = document.getElementById('documentType');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalDescription = document.getElementById('modalDescription');
+
+  if (!docModal || !documentType || !modalTitle || !modalDescription) {
+    console.error('Document modal elements not found.');
+    return;
+  }
+
+  const docInfo = {
+    barangay_clearance: {
+      title: 'Barangay Clearance',
+      desc: 'For employment, business permit, or ID requirements.'
+    },
+    certificate_of_indigency: {
+      title: 'Certificate of Indigency',
+      desc: 'For educational assistance, medical help, or legal aid.'
+    },
+    certificate_of_residency: {
+      title: 'Certificate of Residency',
+      desc: 'Proof of residency for voters registration or bank purposes.'
+    }
+  };
+
+  const info = docInfo[type] || {
+    title: 'Document Request',
+    desc: 'Please complete the form below.'
+  };
+
+  documentType.value = type;
+  modalTitle.textContent = info.title;
+  modalDescription.textContent = info.desc;
+
+  docModal.classList.add('active');
+};
+
+
+  const CSRF_TOKEN = "<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>";
+
+  const promptsTbody = document.getElementById('promptsTbody');
+  const btnPromptsRefresh = document.getElementById('btnPromptsRefresh');
+
+  async function loadPrompts() {
+    if (!promptsTbody) return;
+
+    promptsTbody.innerHTML = `<tr><td colspan="3" class="p-4 text-slate-500">Loading...</td></tr>`;
+
+    try {
+      const res = await fetch('chatbot-prompts-api.php', { method: 'GET' });
+      const data = await res.json();
+
+      if (!data.success) {
+        promptsTbody.innerHTML = `<tr><td colspan="3" class="p-4 text-red-600">${data.message || 'Failed to load prompts'}</td></tr>`;
+        return;
+      }
+
+      renderPrompts(data.data || []);
+    } catch (err) {
+      console.error(err);
+      promptsTbody.innerHTML = `<tr><td colspan="3" class="p-4 text-red-600">Network error loading prompts.</td></tr>`;
+    }
+  }
+
+  function escapeHtml(str) {
+    return String(str ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
+
+  function renderPrompts(rows) {
+    if (!rows.length) {
+      promptsTbody.innerHTML = `<tr><td colspan="3" class="p-4 text-slate-500">No prompts yet.</td></tr>`;
+      return;
+    }
+
+    promptsTbody.innerHTML = rows.map(r => {
+      const preview = (r.reply || '').length > 80 ? (r.reply.slice(0, 80) + '…') : (r.reply || '');
+      return `
+        <tr class="border-t">
+          <td class="p-3 font-medium text-slate-800">${escapeHtml(r.keyword)}</td>
+          <td class="p-3 text-slate-600">${escapeHtml(preview)}</td>
+          <td class="p-3">
+            <div class="flex gap-2">
+              <button class="px-3 py-1 rounded bg-slate-200 hover:bg-slate-300 text-slate-800 text-sm"
+                      onclick="editPrompt(${r.id}, '${escapeHtml(r.keyword)}', '${escapeHtml(r.reply)}')">
+                Edit
+              </button>
+              <button class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white text-sm"
+                      onclick="deletePrompt(${r.id})">
+                Delete
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // Create prompt (connect to your form)
+  async function createPrompt(keyword, reply) {
+    const res = await fetch('chatbot-prompts-api.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ csrf_token: CSRF_TOKEN, keyword, reply })
+    });
+    const data = await res.json();
+    if (!data.success) alert(data.message || 'Failed to create prompt');
+    await loadPrompts();
+  }
+
+  // Edit prompt: simple prompt() UI (you can replace with modal later)
+  window.editPrompt = async function(id, keyword, reply) {
+    const newKeyword = prompt('Edit keyword:', keyword);
+    if (newKeyword === null) return;
+
+    const newReply = prompt('Edit reply:', reply);
+    if (newReply === null) return;
+
+    const res = await fetch('chatbot-prompts-api.php', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ csrf_token: CSRF_TOKEN, id, keyword: newKeyword, reply: newReply })
+    });
+
+    const data = await res.json();
+    if (!data.success) alert(data.message || 'Failed to update prompt');
+    await loadPrompts();
+  }
+
+  window.deletePrompt = async function(id) {
+    if (!confirm('Delete this prompt?')) return;
+
+    const res = await fetch('chatbot-prompts-api.php', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ csrf_token: CSRF_TOKEN, id })
+    });
+
+    const data = await res.json();
+    if (!data.success) alert(data.message || 'Failed to delete prompt');
+    await loadPrompts();
+  }
+
+  // Hook refresh button
+  if (btnPromptsRefresh) {
+    btnPromptsRefresh.addEventListener('click', loadPrompts);
+  }
+
+  // Auto-load on page load
+  document.addEventListener('DOMContentLoaded', loadPrompts);
+
+  // OPTIONAL: hook your existing Create form
+  // If your form has ids #promptKeyword and #promptReply and #btnPromptCreate
+  const promptKeyword = document.getElementById('promptKeyword');
+  const promptReply = document.getElementById('promptReply');
+  const btnPromptCreate = document.getElementById('btnPromptCreate');
+
+  if (btnPromptCreate) {
+    btnPromptCreate.addEventListener('click', (e) => {
+      e.preventDefault();
+      const k = (promptKeyword?.value || '').trim();
+      const r = (promptReply?.value || '').trim();
+      if (!k || !r) return alert('Keyword and Reply are required.');
+      createPrompt(k, r);
+      promptKeyword.value = '';
+      promptReply.value = '';
+    });
+  }

@@ -1,17 +1,17 @@
 <?php
-// news-api.php - Improved with validation and error handling
+
 header('Content-Type: application/json');
 include 'db.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
 try {
-    // Verify database connection
+  
     if ($pdo === null) {
         throw new Exception('Database connection failed');
     }
 
-    // GET - Fetch all news
+  
     if ($method === 'GET') {
         $stmt = $pdo->query("SELECT * FROM news ORDER BY created_at DESC");
         $news = $stmt->fetchAll();
@@ -23,23 +23,23 @@ try {
         exit;
     }
 
-    // POST - Create new news (Admin only)
+   
     if ($method === 'POST') {
-        // Check admin authentication
+       
         if (!isAdmin()) {
             http_response_code(403);
             echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
             exit;
         }
 
-        // Validate CSRF token
+      
         if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
             http_response_code(403);
             echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
             exit;
         }
 
-        // Validate required fields
+      
         $required = ['title', 'excerpt', 'category'];
         foreach ($required as $field) {
             if (empty($_POST[$field])) {
@@ -49,14 +49,14 @@ try {
             }
         }
 
-        // Sanitize inputs
+     
         $title = sanitizeInput($_POST['title']);
         $excerpt = sanitizeInput($_POST['excerpt']);
         $category = sanitizeInput($_POST['category']);
         $urgent = isset($_POST['urgent']) ? 1 : 0;
         $date = date('M d, Y');
 
-        // Validate category
+   
         $validCategories = ['Agriculture', 'Health', 'Infrastructure', 'Urgent', 'General'];
         if (!in_array($category, $validCategories)) {
             http_response_code(400);
@@ -64,7 +64,7 @@ try {
             exit;
         }
 
-        // Insert into database
+       
         $stmt = $pdo->prepare(
             "INSERT INTO news (title, excerpt, category, date, urgent, created_at)
              VALUES (?, ?, ?, ?, ?, NOW())"
@@ -80,7 +80,7 @@ try {
         exit;
     }
 
-    // DELETE - Remove news (Admin only)
+   
     if ($method === 'DELETE') {
         if (!isAdmin()) {
             http_response_code(403);
@@ -112,7 +112,7 @@ try {
         exit;
     }
 
-    // Method not allowed
+  
     http_response_code(405);
     echo json_encode(['success' => false, 'message' => 'Method not allowed']);
 

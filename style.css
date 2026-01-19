@@ -1,9 +1,8 @@
-/* Base Styles */
 body { 
     font-family: 'Inter', sans-serif; 
 }
 
-/* Navigation Styles */
+
 .scroll-active { 
     background-color: white; 
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
@@ -22,12 +21,12 @@ body {
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-/* TEXT COLORS */
+
 .text-scroll {
-    color: #1e293b; /* slate-800 */
+    color: #1e293b; 
 }
 
-/* Modal Styles */
+
 .modal { 
     display: none; 
     position: fixed; 
@@ -97,19 +96,19 @@ body {
     margin-top: 2px; 
     text-align: right; 
 }
-/* Chatbot quick replies */
+
 #chatbot-quick-replies .quick-reply {
     font-size: 12px;
     padding: 6px 10px;
     border-radius: 9999px;
-    border: 1px solid #e2e8f0; /* slate-200 */
+    border: 1px solid #e2e8f0; 
     background: white;
-    color: #475569; /* slate-600 */
+    color: #475569; 
     transition: background-color 0.15s ease, transform 0.15s ease;
 }
 
 #chatbot-quick-replies .quick-reply:hover {
-    background: #f1f5f9; /* slate-100 */
+    background: #f1f5f9; 
     transform: translateY(-1px);
 }
 

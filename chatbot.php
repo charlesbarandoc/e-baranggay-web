@@ -1,22 +1,21 @@
-<!-- Chatbot Widget -->
 <div id="chatbot" class="fixed bottom-6 right-6 w-80 max-w-full bg-white shadow-xl rounded-xl overflow-hidden flex flex-col z-40">
     
-    <!-- Header -->
+  
     <div id="chatbot-header" class="bg-red-600 text-white px-4 py-3 cursor-pointer flex justify-between items-center">
         <span class="font-bold">BM Assistant</span>
         <span id="chatbot-toggle" class="text-xl">✕</span>
     </div>
 
-    <!-- Chat Body -->
+ 
     <div id="chatbot-body" class="p-4 flex-1 overflow-y-auto hidden flex-col space-y-2 bg-slate-50" style="max-height: 400px;">
     </div>
 
-    <!-- Input Area -->
+
     <div id="chatbot-input-area" class="p-2 bg-slate-100 hidden flex flex-col space-y-2">
         <input type="text" id="chatbot-username" placeholder="Enter your name..." 
                class="px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-red-500" />
 
-        <!-- Quick Replies (shown after name entry) -->
+  
         <div id="chatbot-quick-replies" class="hidden flex flex-wrap gap-2">
             <button type="button" class="quick-reply" data-message="Latest news">Latest News</button>
             <button type="button" class="quick-reply" data-message="Urgent news">Urgent</button>
@@ -36,7 +35,7 @@
     </div>
 </div>
 
-<!-- Document Request Modal (For Chatbot) -->
+
 <div id="documentModal" class="modal">
     <div class="modal-content">
         <div class="bg-red-600 text-white p-6 rounded-t-xl">
@@ -106,7 +105,7 @@
     </div>
 </div>
 
-<!-- Emergency Hotlines Modal (For Chatbot) -->
+
 <div id="emergencyModal" class="modal">
     <div class="modal-content max-w-md">
         <div class="bg-red-600 text-white p-6 rounded-t-xl">

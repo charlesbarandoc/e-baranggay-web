@@ -1,6 +1,8 @@
 <?php
 include 'db.php';
-// Safely fetch news with error handling
+$csrf_token = generateCSRFToken();
+
+
 try {
     if ($pdo !== null) {
         $stmt = $pdo->query("SELECT * FROM news ORDER BY created_at DESC");
@@ -10,9 +12,8 @@ try {
     }
 } catch (PDOException $e) {
     error_log("Error fetching news: " . $e->getMessage());
-    $news_data = []; // Empty array if query fails
+    $news_data = [];
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -20,21 +21,15 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Barangay Bacsay Mapula-pula | Official Portal</title>
-    
-    <!-- Stylesheets -->
+
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-    
-    <!-- Icons -->
+
     <script src="https://unpkg.com/lucide@latest"></script>
-
-
 </head>
 <body class="bg-slate-50 text-slate-800">
 
-
-<!-- NAVIGATION -->
 <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 nav-default">
     <div class="container mx-auto px-4 flex justify-between items-center">
         <div class="flex items-center space-x-2">
@@ -67,7 +62,6 @@ try {
     </div>
 </nav>
 
-<!-- HERO SECTION -->
 <section id="home" class="relative h-screen flex items-center justify-center overflow-hidden">
     <div class="absolute inset-0 z-0">
         <img src="image/baranggayhall.png" alt="Barangay Hall" class="w-full h-full object-cover">
@@ -84,7 +78,7 @@ try {
         <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto text-slate-200 font-light">
             Welcome to Barangay Bacsay Mapula-pula. A progressive community in the heart of Claveria, Cagayan.
         </p>
-        
+
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="#services" class="px-8 py-4 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold transition-all transform hover:scale-105 shadow-lg flex items-center justify-center gap-2">
                 <i data-lucide="file-text"></i> View Services
@@ -96,7 +90,6 @@ try {
     </div>
 </section>
 
-<!-- SERVICES SECTION -->
 <section id="services" class="py-20 bg-white">
     <div class="container mx-auto px-4">
         <div class="text-center mb-16">
@@ -106,44 +99,59 @@ try {
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <!-- Service Cards -->
+
+            <!-- Barangay Clearance -->
             <div class="group bg-white rounded-xl p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:border-red-100 transition-all duration-300">
                 <div class="mb-6 transform group-hover:scale-110 transition-transform duration-300 inline-block bg-slate-50 p-4 rounded-full">
                     <i data-lucide="file-text" class="text-red-500 w-8 h-8"></i>
                 </div>
                 <h3 class="text-xl font-bold text-slate-800 mb-3">Barangay Clearance</h3>
                 <p class="text-slate-500 text-sm leading-relaxed mb-6">Requirement for employment, business permit, or postal ID applications.</p>
-                <div class="flex items-center text-red-600 font-bold text-sm">
+
+                <!-- LINK ADDED (no animation changed) -->
+                <a href="#"
+                   onclick="openDocumentModal('barangay_clearance'); return false;"
+                   class="flex items-center text-red-600 font-bold text-sm">
                     Visit Barangay Hall <i data-lucide="chevron-right" class="ml-1 w-4 h-4"></i>
-                </div>
+                </a>
             </div>
 
+            <!-- Certificate of Indigency -->
             <div class="group bg-white rounded-xl p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:border-red-100 transition-all duration-300">
                 <div class="mb-6 transform group-hover:scale-110 transition-transform duration-300 inline-block bg-slate-50 p-4 rounded-full">
                     <i data-lucide="users" class="text-blue-500 w-8 h-8"></i>
                 </div>
                 <h3 class="text-xl font-bold text-slate-800 mb-3">Certificate of Indigency</h3>
                 <p class="text-slate-500 text-sm leading-relaxed mb-6">For educational assistance, medical help, or legal aid requirements.</p>
-                <div class="flex items-center text-red-600 font-bold text-sm">
+
+                <!-- LINK ADDED (no animation changed) -->
+                <a href="#"
+                   onclick="openDocumentModal('certificate_of_indigency'); return false;"
+                   class="flex items-center text-red-600 font-bold text-sm">
                     Visit Barangay Hall <i data-lucide="chevron-right" class="ml-1 w-4 h-4"></i>
-                </div>
+                </a>
             </div>
 
+            <!-- Certificate of Residency -->
             <div class="group bg-white rounded-xl p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:border-red-100 transition-all duration-300">
                 <div class="mb-6 transform group-hover:scale-110 transition-transform duration-300 inline-block bg-slate-50 p-4 rounded-full">
                     <i data-lucide="map-pin" class="text-green-500 w-8 h-8"></i>
                 </div>
                 <h3 class="text-xl font-bold text-slate-800 mb-3">Certificate of Residency</h3>
                 <p class="text-slate-500 text-sm leading-relaxed mb-6">Proof of domicile for voters registration or bank account opening.</p>
-                <div class="flex items-center text-red-600 font-bold text-sm">
+
+                <!-- LINK ADDED (no animation changed) -->
+                <a href="#"
+                   onclick="openDocumentModal('certificate_of_residency'); return false;"
+                   class="flex items-center text-red-600 font-bold text-sm">
                     Visit Barangay Hall <i data-lucide="chevron-right" class="ml-1 w-4 h-4"></i>
-                </div>
+                </a>
             </div>
+
         </div>
     </div>
 </section>
 
-<!-- NEWS SECTION -->
 <section id="news" class="py-20 bg-slate-50">
     <div class="container mx-auto px-4">
         <div class="flex flex-col md:flex-row justify-between items-end mb-12">
@@ -151,7 +159,7 @@ try {
                 <h2 class="text-red-600 font-bold tracking-widest uppercase text-sm mb-2">Balitaan</h2>
                 <h3 class="text-3xl md:text-4xl font-bold text-slate-900">Latest Updates</h3>
             </div>
-            
+
             <div class="flex space-x-2 mt-4 md:mt-0 overflow-x-auto pb-2 md:pb-0">
                 <button onclick="filterNews('All')" class="filter-btn active px-4 py-2 rounded-full text-sm font-medium transition-colors bg-red-600 text-white shadow-md" data-category="All">All</button>
                 <button onclick="filterNews('Urgent')" class="filter-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-white text-slate-600 hover:bg-slate-200" data-category="Urgent">Urgent</button>
@@ -162,12 +170,12 @@ try {
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <?php foreach ($news_data as $item): ?>
-                <div class="news-item bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-slate-100 flex flex-col h-full" 
+                <div class="news-item bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-slate-100 flex flex-col h-full"
                      data-category="<?php echo htmlspecialchars($item['category']); ?>"
                      data-urgent="<?php echo $item['urgent'] ? 'true' : 'false'; ?>">
-                    
+
                     <div class="h-2 w-full <?php echo $item['urgent'] ? 'bg-red-500' : 'bg-green-500'; ?>"></div>
-                    
+
                     <div class="p-6 flex flex-col flex-grow">
                         <div class="flex justify-between items-center mb-4">
                             <span class="text-xs font-bold text-slate-400 flex items-center">
@@ -191,7 +199,6 @@ try {
 
 <?php include 'chatbot.php'; ?>
 
-<!-- FOOTER -->
 <footer id="contact" class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800">
     <div class="container mx-auto px-4">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
@@ -231,8 +238,6 @@ try {
     </div>
 </footer>
 
-<!-- JavaScript -->
 <script src="scripts.js"></script>
-
 </body>
 </html>

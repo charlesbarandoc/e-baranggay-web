@@ -1,11 +1,11 @@
 <?php
-// db.php - Improved database connection with error handling
+
 session_start();
 
 $host = 'localhost';
 $db   = 'barangay_portal';
 $user = 'root';
-$pass = ''; // Change this in production
+$pass = ''; 
 
 $pdo = null;
 
@@ -21,10 +21,10 @@ try {
         ]
     );
 } catch (PDOException $e) {
-    // Log error to file instead of displaying to user
+  
     error_log("Database connection failed: " . $e->getMessage());
     
-    // Show user-friendly error
+   
     http_response_code(500);
     die(json_encode([
         'success' => false,
@@ -32,7 +32,6 @@ try {
     ]));
 }
 
-// CSRF token generation
 function generateCSRFToken() {
     if (empty($_SESSION['csrf_token'])) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -40,17 +39,17 @@ function generateCSRFToken() {
     return $_SESSION['csrf_token'];
 }
 
-// CSRF token validation
+
 function validateCSRFToken($token) {
     return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
 }
 
-// Sanitize input
+
 function sanitizeInput($data) {
     return htmlspecialchars(strip_tags(trim($data)), ENT_QUOTES, 'UTF-8');
 }
 
-// Check if user is admin (simple implementation - enhance for production)
+
 function isAdmin() {
     return isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true;
 }

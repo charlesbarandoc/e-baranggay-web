@@ -26,9 +26,6 @@ try {
     $found = false;
     $reply = '';
 
-    // ---------------------------
-    // 1) Handle urgent/latest first
-    // ---------------------------
     if (strpos($message, 'urgent') !== false) {
         $stmt = $pdo->prepare("SELECT title FROM news WHERE urgent = 1 ORDER BY created_at DESC LIMIT 3");
         $stmt->execute();
@@ -64,9 +61,6 @@ try {
         $found = true;
     }
 
-    // ---------------------------
-    // 2) If not urgent/latest, match prompts
-    // ---------------------------
     if (!$found) {
         $stmt = $pdo->prepare("SELECT keyword, reply FROM chatbot_prompts ORDER BY LENGTH(keyword) DESC");
         $stmt->execute();
@@ -82,9 +76,7 @@ try {
         }
     }
 
-    // ---------------------------
-    // 3) Default reply
-    // ---------------------------
+
     if (!$found) {
         $reply = "Hello $username! I didn't quite get that. You can ask about:\n"
                . "• Barangay clearance\n"
@@ -94,9 +86,6 @@ try {
                . "• Certificate of residency/indigency";
     }
 
-    // ---------------------------
-    // 4) Log chat (optional)
-    // ---------------------------
     try {
         $pdo->exec("CREATE TABLE IF NOT EXISTS chatbot_logs (
             id INT AUTO_INCREMENT PRIMARY KEY,

@@ -34,16 +34,16 @@ $adminUser = $_SESSION['admin_username'] ?? 'Admin';
 
     <input type="hidden" id="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
 
-    <!-- Tabs -->
+
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div class="flex flex-wrap gap-2 p-3 border-b border-slate-200 bg-slate-50">
-            <button class="tab-btn px-4 py-2 rounded-lg font-semibold text-sm bg-red-600 text-white" data-tab="news">News CRUD</button>
-            <button class="tab-btn px-4 py-2 rounded-lg font-semibold text-sm bg-white border border-slate-200 hover:bg-slate-50" data-tab="requests">Document Requests CRUD</button>
-            <button class="tab-btn px-4 py-2 rounded-lg font-semibold text-sm bg-white border border-slate-200 hover:bg-slate-50" data-tab="prompts">Chatbot Prompts CRUD</button>
-            <button class="tab-btn px-4 py-2 rounded-lg font-semibold text-sm bg-white border border-slate-200 hover:bg-slate-50" data-tab="logs">Chat Logs CRUD</button>
+            <button class="tab-btn px-4 py-2 rounded-lg font-semibold text-sm bg-red-600 text-white" data-tab="news">News</button>
+            <button class="tab-btn px-4 py-2 rounded-lg font-semibold text-sm bg-white border border-slate-200 hover:bg-slate-50" data-tab="requests">Document Requests</button>
+            <button class="tab-btn px-4 py-2 rounded-lg font-semibold text-sm bg-white border border-slate-200 hover:bg-slate-50" data-tab="prompts">Chatbot Prompts</button>
+            <button class="tab-btn px-4 py-2 rounded-lg font-semibold text-sm bg-white border border-slate-200 hover:bg-slate-50" data-tab="logs">Chat Logs</button>
         </div>
 
-        <!-- NEWS TAB -->
+
         <section id="tab-news" class="tab-panel p-5">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-1">
@@ -99,7 +99,7 @@ $adminUser = $_SESSION['admin_username'] ?? 'Admin';
             </div>
         </section>
 
-        <!-- REQUESTS TAB -->
+
         <section id="tab-requests" class="tab-panel p-5 hidden">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
                 <h2 class="text-xl font-extrabold">Document Requests</h2>
@@ -134,7 +134,7 @@ $adminUser = $_SESSION['admin_username'] ?? 'Admin';
             <p id="req-msg" class="text-sm mt-2"></p>
         </section>
 
-        <!-- PROMPTS TAB -->
+
         <section id="tab-prompts" class="tab-panel p-5 hidden">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-1">
@@ -180,7 +180,7 @@ $adminUser = $_SESSION['admin_username'] ?? 'Admin';
             </div>
         </section>
 
-        <!-- LOGS TAB -->
+
         <section id="tab-logs" class="tab-panel p-5 hidden">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
                 <h2 class="text-xl font-extrabold">Chat Logs</h2>
@@ -212,7 +212,7 @@ $adminUser = $_SESSION['admin_username'] ?? 'Admin';
         </section>
     </div>
 
-    <!-- Edit modal -->
+
     <div id="modal" class="fixed inset-0 hidden items-center justify-center bg-black/50 p-4">
         <div class="bg-white rounded-xl w-full max-w-xl shadow-lg border border-slate-200">
             <div class="flex items-center justify-between p-4 border-b border-slate-200">
@@ -228,7 +228,7 @@ $adminUser = $_SESSION['admin_username'] ?? 'Admin';
 <script>
 const CSRF = document.getElementById('csrf_token').value;
 
-// ---------- Tabs ----------
+
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.tab-btn').forEach(b => b.className = 'tab-btn px-4 py-2 rounded-lg font-semibold text-sm bg-white border border-slate-200 hover:bg-slate-50');
@@ -245,7 +245,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   });
 });
 
-// ---------- Modal helpers ----------
+
 const modal = document.getElementById('modal');
 const modalBody = document.getElementById('modal-body');
 const modalTitle = document.getElementById('modal-title');
@@ -261,7 +261,7 @@ function openModal(title, html) {
   modal.classList.add('flex');
 }
 
-// ---------- NEWS CRUD ----------
+
 const newsTbody = document.getElementById('news-tbody');
 const newsListMsg = document.getElementById('news-list-msg');
 const newsCreateMsg = document.getElementById('news-create-msg');
@@ -388,7 +388,7 @@ async function deleteNews(id) {
   loadNews();
 }
 
-// ---------- REQUESTS CRUD ----------
+
 const reqTbody = document.getElementById('req-tbody');
 const reqMsg = document.getElementById('req-msg');
 
@@ -485,7 +485,7 @@ async function deleteRequest(id) {
   loadRequests();
 }
 
-// ---------- PROMPTS CRUD ----------
+
 const promptTbody = document.getElementById('prompt-tbody');
 const promptMsg = document.getElementById('prompt-msg');
 const promptCreateMsg = document.getElementById('prompt-create-msg');

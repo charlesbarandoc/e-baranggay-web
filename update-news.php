@@ -1,10 +1,10 @@
 <?php
-// update-news.php - Improved with validation
+
 header('Content-Type: application/json');
 include 'db.php';
 
 try {
-    // Validate database connection
+ 
     if (!isset($pdo) || $pdo === null) {
         http_response_code(500);
         echo json_encode(['success' => false, 'message' => 'Database connection failed']);
@@ -17,21 +17,21 @@ try {
         exit;
     }
 
-    // Check admin authentication
+   
     if (!isAdmin()) {
         http_response_code(403);
         echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
         exit;
     }
 
-    // Validate CSRF token
+   
     if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
         http_response_code(403);
         echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
         exit;
     }
 
-    // Validate required fields
+    
     $required = ['id', 'title', 'excerpt', 'category'];
     foreach ($required as $field) {
         if (empty($_POST[$field])) {
@@ -41,21 +41,21 @@ try {
         }
     }
 
-    // Validate ID is numeric
+    
     if (!is_numeric($_POST['id'])) {
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Invalid news ID']);
         exit;
     }
 
-    // Sanitize inputs
+  
     $id = (int)$_POST['id'];
     $title = sanitizeInput($_POST['title']);
     $excerpt = sanitizeInput($_POST['excerpt']);
     $category = sanitizeInput($_POST['category']);
     $urgent = isset($_POST['urgent']) ? 1 : 0;
 
-    // Validate category
+    
     $validCategories = ['Agriculture', 'Health', 'Infrastructure', 'Urgent', 'General'];
     if (!in_array($category, $validCategories)) {
         http_response_code(400);
@@ -63,7 +63,7 @@ try {
         exit;
     }
 
-    // Check if news exists
+    
     $checkStmt = $pdo->prepare("SELECT id FROM news WHERE id = ?");
     $checkStmt->execute([$id]);
     if (!$checkStmt->fetch()) {
@@ -72,7 +72,7 @@ try {
         exit;
     }
 
-    // Update news
+    
     $stmt = $pdo->prepare(
         "UPDATE news
          SET title = ?, excerpt = ?, category = ?, urgent = ?, updated_at = NOW()
