@@ -1,42 +1,4 @@
-<!-- Chatbot Widget -->
-<div id="chatbot" class="fixed bottom-6 right-6 w-80 max-w-full bg-white shadow-xl rounded-xl overflow-hidden flex flex-col z-40">
-    
-    <!-- Header -->
-    <div id="chatbot-header" class="bg-red-600 text-white px-4 py-3 cursor-pointer flex justify-between items-center">
-        <span class="font-bold">BM Assistant</span>
-        <span id="chatbot-toggle" class="text-xl">✕</span>
-    </div>
-
-    <!-- Chat Body -->
-    <div id="chatbot-body" class="p-4 flex-1 overflow-y-auto hidden flex-col space-y-2 bg-slate-50" style="max-height: 400px;">
-    </div>
-
-    <!-- Input Area -->
-    <div id="chatbot-input-area" class="p-2 bg-slate-100 hidden flex flex-col space-y-2">
-        <input type="text" id="chatbot-username" placeholder="Enter your name..." 
-               class="px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-red-500" />
-
-        <!-- Quick Replies (shown after name entry) -->
-        <div id="chatbot-quick-replies" class="hidden flex flex-wrap gap-2">
-            <button type="button" class="quick-reply" data-message="Latest news">Latest News</button>
-            <button type="button" class="quick-reply" data-message="Urgent news">Urgent</button>
-            <button type="button" class="quick-reply" data-action="openDocument" data-doc="barangay_clearance">Clearance</button>
-            <button type="button" class="quick-reply" data-action="openDocument" data-doc="certificate_of_residency">Residency</button>
-            <button type="button" class="quick-reply" data-action="openDocument" data-doc="certificate_of_indigency">Indigency</button>
-            <button type="button" class="quick-reply" data-action="openEmergency">Hotlines</button>
-        </div>
-
-        <div class="flex">
-            <input type="text" id="chatbot-input" placeholder="Type your question..." 
-                   class="flex-1 px-3 py-2 rounded-l-lg border border-slate-300 focus:outline-none focus:border-red-500" />
-            <button id="chatbot-send" class="bg-red-600 text-white px-4 py-2 rounded-r-lg hover:bg-red-700 font-bold">
-                Send
-            </button>
-        </div>
-    </div>
-</div>
-
-<!-- Document Request Modal (For Chatbot) -->
+<!-- Document Request Modal -->
 <div id="documentModal" class="modal">
     <div class="modal-content">
         <div class="bg-red-600 text-white p-6 rounded-t-xl">
@@ -47,7 +9,7 @@
         </div>
         
         <form id="documentForm" class="p-6">
-            <input type="hidden" name="csrf_token" value="<?php echo isset($csrf_token) ? $csrf_token : ''; ?>">
+            <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
             <input type="hidden" name="document_type" id="documentType">
             
             <div class="mb-6 bg-blue-50 p-4 rounded-lg">
@@ -77,8 +39,8 @@
                 </div>
 
                 <div>
-                    <label class="block text-slate-700 font-medium mb-2">Complete Address <span class="text-red-500">*</span></label>
-                    <textarea name="address" rows="2" required
+                    <label class="block text-slate-700 font-medium mb-2">Complete Address</label>
+                    <textarea name="address" rows="2"
                               class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-red-500"></textarea>
                 </div>
 
@@ -106,7 +68,7 @@
     </div>
 </div>
 
-<!-- Emergency Hotlines Modal (For Chatbot) -->
+<!-- Emergency Hotlines Modal -->
 <div id="emergencyModal" class="modal">
     <div class="modal-content max-w-md">
         <div class="bg-red-600 text-white p-6 rounded-t-xl">

@@ -88,6 +88,17 @@ document.addEventListener('DOMContentLoaded', function () {
   const chatbotInput = document.getElementById('chatbot-input');
   const chatbotSend = document.getElementById('chatbot-send');
   const chatbotUsername = document.getElementById('chatbot-username');
+  const quickReplies = document.getElementById('chatbot-quick-replies');
+
+  // Modals (optional)
+  const docModal = document.getElementById('documentModal');
+  const emergencyModal = document.getElementById('emergencyModal');
+  const docForm = document.getElementById('documentForm');
+  const formMessage = document.getElementById('formMessage');
+  const submitBtn = document.getElementById('submitBtn');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalDescription = document.getElementById('modalDescription');
+  const documentType = document.getElementById('documentType');
 
   if (!chatbotHeader || !chatbotBody || !chatbotInputArea) {
     console.error("Chatbot elements missing: check chatbot.php is included.");
@@ -113,9 +124,41 @@ document.addEventListener('DOMContentLoaded', function () {
         username = chatbotUsername.value.trim();
         chatbotUsername.disabled = true;
         appendMessage(`Hello ${username}! How can I assist you today?`, 'bot-msg');
+
+        // Show quick replies after name is set
+        if (quickReplies) {
+  quickReplies.classList.remove('hidden');
+  quickReplies.style.display = 'flex';   // force show
+  quickReplies.style.flexWrap = 'wrap';
+  quickReplies.style.gap = '8px';
+}
+
       }
     });
   }
+
+  // Quick replies handler
+  quickReplies?.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+
+    const action = btn.dataset.action;
+    const message = btn.dataset.message;
+
+    if (action === 'openDocument') {
+      openDocumentModal(btn.dataset.doc);
+      return;
+    }
+    if (action === 'openEmergency') {
+      openEmergencyModal();
+      return;
+    }
+
+    if (message) {
+      chatbotInput.value = message;
+      sendMessage();
+    }
+  });
 
   // Send message
   chatbotSend?.addEventListener('click', sendMessage);
@@ -135,32 +178,137 @@ document.addEventListener('DOMContentLoaded', function () {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: `message=${encodeURIComponent(msg)}&username=${encodeURIComponent(username)}`
     })
-      .then(res => res.text())
-      .then(data => appendMessage(data, 'bot-msg', true))
+      .then(res => res.json())
+      .then(data => appendMessage((data && data.reply) ? data.reply : 'Sorry, I could not understand the response.', 'bot-msg'))
       .catch(err => {
         console.error('Chatbot error:', err);
         appendMessage('Sorry, I had trouble connecting. Please try again.', 'bot-msg');
       });
   }
 
-  function appendMessage(message, type, parseHTML = false) {
+  function appendMessage(message, type) {
     const msgDiv = document.createElement('div');
     msgDiv.classList.add('chatbot-msg', type);
 
     const now = new Date();
     const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
 
-    if (parseHTML) {
-      msgDiv.innerHTML = message + `<div class="timestamp">${time}</div>`;
-    } else {
-      msgDiv.textContent = message;
-      const ts = document.createElement('div');
-      ts.className = 'timestamp';
-      ts.textContent = time;
-      msgDiv.appendChild(ts);
-    }
+    // Safe rendering: use textContent only (prevents XSS)
+    msgDiv.textContent = message;
+
+    const ts = document.createElement('div');
+    ts.className = 'timestamp';
+    ts.textContent = time;
+    msgDiv.appendChild(ts);
 
     chatbotBody.appendChild(msgDiv);
     chatbotBody.scrollTop = chatbotBody.scrollHeight;
+  }
+
+  // ================== CHATBOT MODALS ==================
+  const docInfo = {
+    barangay_clearance: {
+      title: 'Barangay Clearance',
+      desc: 'For employment, permits, IDs, and general verification.'
+    },
+    certificate_of_residency: {
+      title: 'Certificate of Residency',
+      desc: 'Proof of residency within the barangay.'
+    },
+    certificate_of_indigency: {
+      title: 'Certificate of Indigency',
+      desc: 'For medical, educational, or government assistance requirements.'
+    },
+    barangay_id: {
+      title: 'Barangay ID',
+      desc: 'Request for barangay identification.'
+    }
+  };
+
+  function openDocumentModal(type) {
+    if (!docModal || !documentType || !modalTitle || !modalDescription) {
+      // Fallback: send a message instead
+      chatbotInput.value = type ? `request ${type}` : 'request document';
+      sendMessage();
+      return;
+    }
+
+    const info = docInfo[type] || { title: 'Document Request', desc: 'Please fill out the form to request your document.' };
+    documentType.value = type || '';
+    modalTitle.textContent = info.title;
+    modalDescription.textContent = info.desc;
+
+    // Reset form message
+    if (formMessage) {
+      formMessage.classList.add('hidden');
+      formMessage.textContent = '';
+      formMessage.className = 'mt-4 hidden';
+    }
+
+    docModal.classList.add('active');
+  }
+
+  function closeModal() {
+    docModal?.classList.remove('active');
+  }
+
+  function openEmergencyModal() {
+    emergencyModal?.classList.add('active');
+    safeLucideInit();
+  }
+
+  function closeEmergencyModal() {
+    emergencyModal?.classList.remove('active');
+  }
+
+  // Expose modal functions for inline onclick in chatbot.php
+  window.closeModal = closeModal;
+  window.openEmergencyModal = openEmergencyModal;
+  window.closeEmergencyModal = closeEmergencyModal;
+
+  // Document request submit (AJAX)
+  if (docForm) {
+    docForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!submitBtn) return;
+
+      const lastDocType = documentType?.value || '';
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting...';
+
+      try {
+        const fd = new FormData(docForm);
+        const res = await fetch('document-request.php', { method: 'POST', body: fd });
+        const data = await res.json();
+
+        if (data && data.success) {
+          const ref = data.reference_number ? `\nReference: ${data.reference_number}` : '';
+          showFormMessage(`✅ Request sent successfully!${ref}`, true);
+
+          // Also show in chat for better UX
+          appendMessage(`Your document request was submitted.${ref}`, 'bot-msg');
+
+          docForm.reset();
+          // Restore the document type (reset clears input values)
+          if (documentType) documentType.value = lastDocType;
+        } else {
+          showFormMessage(`❌ ${data?.message || 'Failed to submit request.'}`, false);
+        }
+      } catch (err) {
+        console.error('Document request error:', err);
+        showFormMessage('❌ Network error. Please try again.', false);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Request';
+      }
+    });
+  }
+
+  function showFormMessage(text, success) {
+    if (!formMessage) return;
+    formMessage.classList.remove('hidden');
+    formMessage.textContent = text;
+    formMessage.className = `mt-4 p-3 rounded-lg text-sm ${success ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`;
   }
 });

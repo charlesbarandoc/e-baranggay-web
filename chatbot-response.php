@@ -1,110 +1,121 @@
 <?php
-// chatbot-response.php - Improved with validation and logging
-header('Content-Type: text/html; charset=UTF-8');
+header('Content-Type: application/json; charset=UTF-8');
 include 'db.php';
+
+function json_out($arr, $code = 200) {
+    http_response_code($code);
+    echo json_encode($arr);
+    exit;
+}
 
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        http_response_code(405);
-        exit('Invalid request method');
+        json_out(['reply' => 'Invalid request method'], 405);
     }
 
-    // Check if PDO connection exists
-    if (!$pdo) {
-        echo "Sorry, I'm having trouble connecting right now. Please try again later.";
-        exit;
+    if (!isset($pdo) || !$pdo) {
+        json_out(['reply' => "Sorry, I'm having trouble connecting right now. Please try again later."], 500);
     }
 
-    // Sanitize inputs
     $message = strtolower(trim($_POST['message'] ?? ''));
     $username = sanitizeInput($_POST['username'] ?? 'Guest');
 
-    // Validate message
-    if (empty($message)) {
-        echo "Please enter a message.";
-        exit;
-    }
-
-    // Limit message length
-    if (strlen($message) > 500) {
-        echo "Message is too long. Please keep it under 500 characters.";
-        exit;
-    }
+    if ($message === '') json_out(['reply' => 'Please enter a message.'], 200);
+    if (strlen($message) > 500) json_out(['reply' => 'Message is too long. Please keep it under 500 characters.'], 200);
 
     $found = false;
-    $response = "";
+    $reply = '';
 
-    // Search for matching keyword in database
-    try {
+    // ---------------------------
+    // 1) Handle urgent/latest first
+    // ---------------------------
+    if (strpos($message, 'urgent') !== false) {
+        $stmt = $pdo->prepare("SELECT title FROM news WHERE urgent = 1 ORDER BY created_at DESC LIMIT 3");
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if ($rows) {
+            $lines = ["URGENT Updates:"];
+            foreach ($rows as $r) {
+                $lines[] = "• " . $r['title'];
+            }
+            $reply = implode("\n", $lines);
+        } else {
+            $reply = "No urgent updates right now. You can check the Balitaan section for regular news.";
+        }
+
+        $found = true;
+    }
+    else if (strpos($message, 'latest') !== false) {
+        $stmt = $pdo->prepare("SELECT title FROM news ORDER BY created_at DESC LIMIT 5");
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if ($rows) {
+            $lines = ["Latest News:"];
+            foreach ($rows as $r) {
+                $lines[] = "• " . $r['title'];
+            }
+            $reply = implode("\n", $lines);
+        } else {
+            $reply = "No news posted yet. Please check again later.";
+        }
+
+        $found = true;
+    }
+
+    // ---------------------------
+    // 2) If not urgent/latest, match prompts
+    // ---------------------------
+    if (!$found) {
         $stmt = $pdo->prepare("SELECT keyword, reply FROM chatbot_prompts ORDER BY LENGTH(keyword) DESC");
         $stmt->execute();
-        $prompts = $stmt->fetchAll();
-    } catch (PDOException $e) {
-        error_log("Chatbot prompts query failed: " . $e->getMessage());
-        echo "I'm having technical difficulties. Please contact the Barangay Hall at +63 917 123 4567.";
-        exit;
-    }
+        $prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    foreach ($prompts as $p) {
-        $keyword = strtolower($p['keyword']);
-        if (strpos($message, $keyword) !== false) {
-            $response = $p['reply'];
-            $found = true;
-            break;
-        }
-    }
-
-    // If asking about urgent/latest news, fetch from database
-    if (!$found && (strpos($message, 'latest') !== false || strpos($message, 'urgent') !== false)) {
-        try {
-            $urgentStmt = $pdo->prepare("SELECT title FROM news WHERE urgent = 1 ORDER BY created_at DESC LIMIT 3");
-            $urgentStmt->execute();
-            $urgentNews = $urgentStmt->fetchAll();
-        } catch (PDOException $e) {
-            error_log("Urgent news query failed: " . $e->getMessage());
-            $urgentNews = [];
-        }
-        
-        if (count($urgentNews) > 0) {
-            $response = "<strong>URGENT Updates:</strong><br>";
-            foreach ($urgentNews as $news) {
-                $response .= "• " . htmlspecialchars($news['title']) . " (URGENT)<br>";
+        foreach ($prompts as $p) {
+            $keyword = strtolower(trim($p['keyword']));
+            if ($keyword !== '' && strpos($message, $keyword) !== false) {
+                $reply = $p['reply'];
+                $found = true;
+                break;
             }
-            $response .= '<a href="#news" class="text-red-600 underline">View all news</a>';
-            $found = true;
         }
     }
 
-    // Default response if no match found
+    // ---------------------------
+    // 3) Default reply
+    // ---------------------------
     if (!$found) {
-        $response = "Hello $username! I didn't quite get that. You can ask about:<br>
-        • Barangay clearance<br>
-        • Emergency hotline<br>
-        • Latest news<br>
-        • Office hours<br>
-        • Certificate of residency/indigency";
+        $reply = "Hello $username! I didn't quite get that. You can ask about:\n"
+               . "• Barangay clearance\n"
+               . "• Emergency hotline\n"
+               . "• Latest news\n"
+               . "• Office hours\n"
+               . "• Certificate of residency/indigency";
     }
 
-    // Log conversation for analytics (optional)
+    // ---------------------------
+    // 4) Log chat (optional)
+    // ---------------------------
     try {
-        $logStmt = $pdo->prepare(
-            "INSERT INTO chatbot_logs (username, message, response, created_at) 
-             VALUES (?, ?, ?, NOW())"
-        );
-        // Only log if table exists - this is optional
-        $logStmt->execute([$username, $message, strip_tags($response)]);
-    } catch (PDOException $e) {
-        // Silently fail if logging table doesn't exist
-        error_log("Chatbot logging failed: " . $e->getMessage());
+        $pdo->exec("CREATE TABLE IF NOT EXISTS chatbot_logs (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(100) NOT NULL,
+            message TEXT NOT NULL,
+            response TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            flagged TINYINT(1) DEFAULT 0
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+        $logStmt = $pdo->prepare("INSERT INTO chatbot_logs (username, message, response) VALUES (?, ?, ?)");
+        $logStmt->execute([$username, $message, $reply]);
+    } catch (Exception $e) {
+        // ignore logging errors
     }
 
-    echo $response;
+    json_out(['reply' => $reply], 200);
 
-} catch (PDOException $e) {
-    error_log("Chatbot database error: " . $e->getMessage());
-    echo "I'm having trouble connecting right now. Please try again later or contact the Barangay Hall directly at +63 917 123 4567.";
 } catch (Exception $e) {
     error_log("Chatbot error: " . $e->getMessage());
-    echo "An error occurred. Please try again.";
+    json_out(['reply' => "An error occurred. Please try again."], 500);
 }
-?>

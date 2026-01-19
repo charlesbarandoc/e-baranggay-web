@@ -97,3 +97,22 @@ body {
     margin-top: 2px; 
     text-align: right; 
 }
+/* Chatbot quick replies */
+#chatbot-quick-replies .quick-reply {
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 9999px;
+    border: 1px solid #e2e8f0; /* slate-200 */
+    background: white;
+    color: #475569; /* slate-600 */
+    transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+#chatbot-quick-replies .quick-reply:hover {
+    background: #f1f5f9; /* slate-100 */
+    transform: translateY(-1px);
+}
+
+#chatbot-quick-replies .quick-reply:active {
+    transform: translateY(0px);
+}
