@@ -100,7 +100,7 @@ try {
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 
-            <!-- Barangay Clearance -->
+            
             <div class="group bg-white rounded-xl p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:border-red-100 transition-all duration-300">
                 <div class="mb-6 transform group-hover:scale-110 transition-transform duration-300 inline-block bg-slate-50 p-4 rounded-full">
                     <i data-lucide="file-text" class="text-red-500 w-8 h-8"></i>
@@ -108,15 +108,15 @@ try {
                 <h3 class="text-xl font-bold text-slate-800 mb-3">Barangay Clearance</h3>
                 <p class="text-slate-500 text-sm leading-relaxed mb-6">Requirement for employment, business permit, or postal ID applications.</p>
 
-                <!-- LINK ADDED (no animation changed) -->
+                
                 <a href="#"
                    onclick="openDocumentModal('barangay_clearance'); return false;"
                    class="flex items-center text-red-600 font-bold text-sm">
-                    Visit Barangay Hall <i data-lucide="chevron-right" class="ml-1 w-4 h-4"></i>
+                    Request Document <i data-lucide="chevron-right" class="ml-1 w-4 h-4"></i>
                 </a>
             </div>
 
-            <!-- Certificate of Indigency -->
+            
             <div class="group bg-white rounded-xl p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:border-red-100 transition-all duration-300">
                 <div class="mb-6 transform group-hover:scale-110 transition-transform duration-300 inline-block bg-slate-50 p-4 rounded-full">
                     <i data-lucide="users" class="text-blue-500 w-8 h-8"></i>
@@ -124,15 +124,15 @@ try {
                 <h3 class="text-xl font-bold text-slate-800 mb-3">Certificate of Indigency</h3>
                 <p class="text-slate-500 text-sm leading-relaxed mb-6">For educational assistance, medical help, or legal aid requirements.</p>
 
-                <!-- LINK ADDED (no animation changed) -->
+                
                 <a href="#"
                    onclick="openDocumentModal('certificate_of_indigency'); return false;"
                    class="flex items-center text-red-600 font-bold text-sm">
-                    Visit Barangay Hall <i data-lucide="chevron-right" class="ml-1 w-4 h-4"></i>
+                    Request Document <i data-lucide="chevron-right" class="ml-1 w-4 h-4"></i>
                 </a>
             </div>
 
-            <!-- Certificate of Residency -->
+            
             <div class="group bg-white rounded-xl p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:border-red-100 transition-all duration-300">
                 <div class="mb-6 transform group-hover:scale-110 transition-transform duration-300 inline-block bg-slate-50 p-4 rounded-full">
                     <i data-lucide="map-pin" class="text-green-500 w-8 h-8"></i>
@@ -140,11 +140,11 @@ try {
                 <h3 class="text-xl font-bold text-slate-800 mb-3">Certificate of Residency</h3>
                 <p class="text-slate-500 text-sm leading-relaxed mb-6">Proof of domicile for voters registration or bank account opening.</p>
 
-                <!-- LINK ADDED (no animation changed) -->
+                
                 <a href="#"
                    onclick="openDocumentModal('certificate_of_residency'); return false;"
                    class="flex items-center text-red-600 font-bold text-sm">
-                    Visit Barangay Hall <i data-lucide="chevron-right" class="ml-1 w-4 h-4"></i>
+                    Request Document <i data-lucide="chevron-right" class="ml-1 w-4 h-4"></i>
                 </a>
             </div>
 
